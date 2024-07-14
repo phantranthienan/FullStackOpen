@@ -7,16 +7,16 @@ const corsOptions = {
     origin: 'http://localhost:5173',
     optionsSuccesStatus: 200,
 }
-app.use(cors(corsOptions))
-
 morgan.token('data', (req, res) => {
     return JSON.stringify(req.body)
 })
+
+app.use(cors(corsOptions))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 app.use(express.json())
+app.use(express.static('dist'))
 
-const PORT = 3001
-
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
