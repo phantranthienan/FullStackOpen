@@ -9,6 +9,7 @@ primary_region = 'cdg'
 [build]
 
 [env]
+  MONGODB_URL = "mongodb+srv://ngaoin1987:qwerty123456@cluster0.0ym1ffz.mongodb.net/phonebookDatabase?retryWrites=true&w=majority&appName=Cluster"
   PORT = "3000" 
 
 [http_service]
