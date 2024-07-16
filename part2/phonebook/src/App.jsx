@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-import { nanoid } from "nanoid";
-import axios from "axios";
 import personsService from "./services/personsService";
 
 import PersonForm from "./components/PersonForm";
@@ -45,11 +43,11 @@ const App = () => {
       const newPerson = {
         name: newName,
         number: newNumber,
-        id: nanoid(3),
       };
       personsService
         .create(newPerson)
         .then((createdPerson) => {
+          console.log(createdPerson);
           setPersons([...persons, createdPerson]);
           setShowMessage(true);
           setNotification({
@@ -60,7 +58,7 @@ const App = () => {
         .catch((error) => {
           setShowMessage(true);
           setNotification({
-            message: error,
+            message: error.response.data.error,
             type: "error",
           });
         });
@@ -93,10 +91,9 @@ const App = () => {
           .catch((error) => {
             setShowMessage(true);
             setNotification({
-              message: `Information of ${selectedPerson.name} has already been removed from server`,
+              message: error.response.data.error,
               type: "error",
             });
-            setPersons(persons.filter((person) => person.id !== selectedPerson.id));
           });
       }
     }
