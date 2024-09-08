@@ -1,5 +1,4 @@
 const blogsRouter = require('express').Router()
-const jwt = require('jsonwebtoken')
 const Blog = require('../models/blog')
 const User = require('../models/user')  
 
@@ -66,7 +65,7 @@ blogsRouter.put('/:id', async (request, response) => {
         return response.status(401).json({ error: 'Unauthorized' })
     }
 
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true }).populate('user', { username: 1, name: 1 })
     response.json(updatedBlog)
 })
 
