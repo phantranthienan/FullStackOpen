@@ -1,9 +1,12 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')  
+const Comment = require('../models/comment')
 
 blogsRouter.get('/', async (request, response) => {
-    const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
+    const blogs = await Blog.find({})
+                            .populate('user', { username: 1, name: 1 })
+                            .populate('comments', { content: 1 })
     response.json(blogs)
 })
 
@@ -29,11 +32,11 @@ blogsRouter.post('/', async (request, response) => {
     })
 
     const savedBlog = await blog.save()
-
     user.blogs = user.blogs.concat(savedBlog.id)
     await user.save()
 
-    response.status(201).json(savedBlog)
+    const populatedBlog = await savedBlog.populate('user', { username: 1, name: 1 })
+    response.status(201).json(populatedBlog)
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
@@ -65,8 +68,27 @@ blogsRouter.put('/:id', async (request, response) => {
         return response.status(401).json({ error: 'Unauthorized' })
     }
 
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true }).populate('user', { username: 1, name: 1 })
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
+                                  .populate('user', { username: 1, name: 1 })
+                                  .populate('comments', { content: 1 })
     response.json(updatedBlog)
+})
+
+blogsRouter.post('/:id/comments', async (request, response) => {
+    const { content } = request.body
+    const blog = await Blog.findById(request.params.id)
+
+    const comment = new Comment({
+        content,
+        blog: blog.id
+    })
+
+    const savedComment = await comment.save()
+    blog.comments = blog.comments.concat(savedComment.id)
+    const savedBlog = await blog.save()
+    const populatedBlog = await Blog.findById(savedBlog.id).populate('comments', { content: 1 })
+
+    response.status(201).json(populatedBlog)
 })
 
 module.exports = blogsRouter
