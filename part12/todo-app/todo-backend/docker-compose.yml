@@ -1,0 +1,7 @@
+name: todoapp-backend
+services:
+  todoapp-backend:
+    image: men-redis
+    build: .
+    ports:
+      - "3107:3107"
